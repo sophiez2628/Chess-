@@ -182,7 +182,8 @@ class King < Piece
 end
 
 class NullPiece < Piece
-
+  include Singleton
+  
   def present?
     false
   end
