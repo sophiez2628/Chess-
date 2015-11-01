@@ -42,6 +42,8 @@ module Cursorable
       exit 0
     when :return, :space
       @cursor_pos
+      puts @cursor_pos.inspect
+      # returns [row, col], starting with row 0 and col 0
     when :left, :right, :up, :down
       update_pos(MOVES[key])
       nil

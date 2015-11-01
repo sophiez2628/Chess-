@@ -1,5 +1,6 @@
 require_relative 'module'
 require 'byebug'
+require 'singleton'
 class Piece
   attr_reader :color, :pos, :board
   def initialize(color, pos, board)
@@ -17,11 +18,7 @@ class Piece
   end
 
   def valid_moves(start, end_pos, pos_moves = nil)
-    #create a copy of board
-    #check if the position will put us in check
-    #filter out moves that will put us in check
-
-    # if pos moves isnt nil, iterate thru pos_moves
+     #moves that do not leave the king in check 
      if !pos_moves.include?(end_pos)
        return false
      elsif @board.blocked_route?(start, end_pos, pos_moves)
@@ -34,24 +31,6 @@ class Piece
      end
      true
    end
-    # if our piece is on any square, dont push
-    #elsif ...
-
-    #comb through moves and select ones that are not in check and not bocked
-
-      #valid_route(start, end_pos)
-      # how the pawn knows whether it is attacking or not
-      # check whether place its moving to has a piece or not
-      # check what color piece is
-
-
-
-
-
-    #check what piece it is
-    #have piece class check if it is valid or not
-    #call valid_route? in piece class to check if it is blocked
-    #in_check?
 
 
   def piece_dup(new_board)
@@ -59,7 +38,7 @@ class Piece
   end
 end
 
-# print Pawn.new
+
 
 class Pawn < Piece
 
@@ -71,7 +50,11 @@ class Pawn < Piece
   attr_accessor :moved
 
   def to_s
-    color == "white" ? " \u2659 " : " \u265f "
+    color == :white ? " \u2659 " : " \u265f "
+  end
+
+  def empty?
+    false
   end
 
   MOVE_UP = [[2,0],[1,0]]
@@ -82,7 +65,7 @@ class Pawn < Piece
     MOVE_UP.each do |pos|
       #change pawn's moved instance variable after being moved
       next if self.moved
-      if self.color == "white"
+      if self.color == :white
         row_idx = pos.first + start_pos.first
         col_idx = pos.last + start_pos.first
         #debugger
@@ -96,7 +79,7 @@ class Pawn < Piece
     end
 
     DIAG.each do |pos|
-      if self.color == "white"
+      if self.color == :white
         row_idx = pos.first + start_pos.first
         col_idx = pos.last + start_pos.first
         moves += [row_idx, col_idx] if board.in_bounds?([row_idx, col_idx]) && board.grid[row_idx][col_idx].color != self.color
@@ -115,38 +98,57 @@ end
 class Bishop < Piece
   include SlidingPiece
   def to_s
-    color == "white" ? " \u2657 " : " \u265d "
+    color == :white ? " \u2657 " : " \u265d "
   end
 
-  def moves(start_pos)
-    pos_moves = []
-    DIAG_MOVES_DIFF.each do |dirc|
-      pos_moves += slide_moves(start_pos, dirc)
-    end
-    pos_moves
+  def empty?
+    false
   end
+
+  def moves_dirc
+    DIAG_MOVES_DIRC
+  end
+
 end
 
 class Rook < Piece
   include SlidingPiece
 
   def to_s
-    color == "white" ? " \u2656 " : " \u265c "
+    color == :white ? " \u2656 " : " \u265c "
   end
 
-  def moves(start_pos)
-    pos_moves = []
-    NORMAL_MOVES_DIFF.each do |dirc|
-      pos_moves += slide_moves(start_pos, dirc)
-    end
-    pos_moves
+  def moves_dirc
+    NORMAL_MOVES_DIRC
   end
+
+
+end
+
+class Queen < Piece
+  include SlidingPiece
+  def to_s
+    color == :white ? " \u2655 " : " \u265b "
+  end
+
+  def empty?
+    false
+  end
+
+  def moves_dirc
+    DIAG_MOVES_DIRC + NORMAL_MOVES_DIRC
+  end
+
 end
 
 class Knight < Piece
   include SteppingPiece
   def to_s
-    color == "white" ? " \u2658 " : " \u265e "
+    color == :white ? " \u2658 " : " \u265e "
+  end
+
+  def empty?
+    false
   end
 
   def moves(start_pos)
@@ -154,36 +156,25 @@ class Knight < Piece
   end
 end
 
-class Queen < Piece
-  include SlidingPiece
-  def to_s
-    color == "white" ? " \u2655 " : " \u265b "
-  end
-    #print out pos moves without in_check or end_pos check
-  def moves(start_pos)
-    pos_moves = []
-    (DIAG_MOVES_DIFF + NORMAL_MOVES_DIFF).each do |dirc|
-      pos_moves += slide_moves(start_pos, dirc)
-    end
-    pos_moves
-  end
-
-end
 
 class King < Piece
   include SteppingPiece
   def to_s
-    color == "white" ? " \u2654 " : " \u265a "
+    color == :white ? " \u2654 " : " \u265a "
   end
 
   def moves(start_pos)
     king_moves(start_pos)
   end
+
+  def empty?
+    false
+  end
 end
 
-class NullPiece < Piece
+class NullPiece
   include Singleton
-  
+
   def present?
     false
   end
@@ -198,5 +189,9 @@ class NullPiece < Piece
 
   def moves(start_pos)
     []
+  end
+
+  def empty?
+    true
   end
 end

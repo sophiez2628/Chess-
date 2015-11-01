@@ -13,8 +13,40 @@ class Board
 
   def populate
     @grid = Array.new(8) { Array.new(8, null_piece )}
+    # break down tasks
+    [:black, :white].each do |color|
+      fill_back_row(color)
+      fill_front_row(color)
+    end
   end
 
+  def add_piece(pos, piece)
+    self[pos] = piece
+  end
+
+  def fill_back_row(color)
+    back_row = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
+    #ternary statement has a return value
+    i = (color == :white ? 7 : 0)
+    back_row.each_with_index do |piece, index|
+      pos = [i, index]
+      new_piece = piece.new(color, pos, self)
+      add_piece(pos, new_piece)
+    end
+
+  end
+
+  def fill_front_row(color)
+    i = (color == :white ? 6 : 1 )
+    8.times.each do |index|
+      pos = [i, index]
+      new_piece = Pawn.new(color, pos, self )
+      add_piece(pos, new_piece)
+    end
+  end
+
+
+  #note that this method takes in one argument!
   def [](pos)
     x, y = pos
     @grid[x][y]
@@ -26,38 +58,26 @@ class Board
   end
   #piece class will verify if it is a valid move
   def in_check?(color)
-      king_pos = find_king(color)
-      grid.each_with_index do |row, row_idx|
-        row.each_with_index do |piece, col_idx|
-          #debugger if row_idx == 0 && col_idx == 6
-          return true if piece.color != color && piece.moves([row_idx, col_idx]).include?(king_pos)
-        end
-      end
-      false
+    king_pos = find_king(color).pos
+    pieces.any? do |piece|
+      piece.color != color && piece.moves(piece.pos, piece.moves_dirc).include?(king_pos)
+    end
   end
-      #iterate through all the moves of the other board's pieces and check if king's position is include
+
+  def pieces
+    grid.flatten.reject { |piece| piece.empty? }
+  end
 
   def find_king(color)
-    self.grid.each_with_index do |row, row_idx|
-      row.each_with_index do |piece, col_idx|
-        return [row_idx, col_idx] if piece.is_a?(King) && piece.color == color
-      end
-    end
+    pieces.find { |piece| piece.color == color && piece.is_a?(King) }
   end
 
   def checkmate?(color)
     #no more valid moves for king
     #find all the valid moves of the king and determine if all of them are in the pos positions of the opponent
-    king_pos = find_king(color) #color of the current player
-    king_moves = self.grid[king_pos.first][king_pos.last].moves(king_pos)
-    opp_moves = Set.new
-    grid.each_with_index do |row, row_idx|
-      row.each_with_index do |piece, col_idx|
-        opp_moves += piece.moves([row_idx, col_idx]) if piece.color != color
-      end
-    end
-    debugger
-    #king_moves.empty? ? false : king_moves.all? { |king_move| opp_moves.include?(king_move) }
+    return false unless in_check(color)
+    king = find_king(color)
+    pieces.select {|piece| piece.color == color }.all? { |piece| piece.valid_moves.empty? }
 
   end
 
@@ -73,7 +93,7 @@ class Board
     end
     new_board
   end
-  ###################
+
   def move_piece(start, end_pos)
 #debugger
     if self.in_check?(self.grid[start.first][start.last].color)
@@ -131,8 +151,7 @@ class Board
   def rows
     @grid
   end
-end
 
-new_board = Board.new
-new_display = Display.new(new_board)
-new_display.render
+  private
+  attr_reader :null_piece
+end

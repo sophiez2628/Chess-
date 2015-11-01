@@ -1,20 +1,27 @@
 module SlidingPiece
   #bishop, rook, queen
 
-  #iterate through possible moves until it hits an piece that is occupied
+  DIAG_MOVES_DIRC = [[1,1],[1,-1],[-1,1],[-1,-1]]
+  NORMAL_MOVES_DIRC = [[1,0],[-1,0],[0,1],[0, -1]]
 
-  DIAG_MOVES_DIFF = [[1,1],[1,-1],[-1,1],[-1,-1]]
-  NORMAL_MOVES_DIFF = [[1,0],[-1,0],[0,1],[0, -1]]
+  def diag_moves_dirc
+    DIAG_MOVES_DIRC
+  end
 
- # Dry out functionality into slide
-  def slide_moves(start_pos, dirc) # this returns array of every move possible from one spot (not considering end_pos)
-    #debugger
+  def normal_moves_dirc
+    NORMAL_MOVES_DIRC
+  end
+
+  def moves(start_pos, moves_dirc)
     moves = []
-    until !board.in_bounds?(start_pos) || board.occupied?(start_pos, self.color)
-      row_idx = dirc.first + start_pos.first
-      col_idx = dirc.last + start_pos.last
-      moves += [row_idx, col_idx]
-      start_pos = [row_idx, col_idx]
+
+    moves_dirc.each do |dirc|
+      until !board.in_bounds?(start_pos) || board.occupied?(start_pos, self.color)
+        row_idx = dirc.first + start_pos.first
+        col_idx = dirc.last + start_pos.last
+        moves += [row_idx, col_idx]
+        start_pos = [row_idx, col_idx]
+      end
     end
       moves
   end
@@ -51,13 +58,3 @@ module SteppingPiece
 
 
 end
-
-
-    #occupied receives message from board
-
-
-    # what do we call occupied on without instance of board
-    # third var thats passed in based on results of occupied method
-    # so if occupied true, then run. dont forget to check color
-
-    # check to see if theres a piece in the diag. if there is, add those moves

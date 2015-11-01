@@ -19,7 +19,6 @@ class Display
     row.map.with_index do |piece, j|
       color_options = colors_for(i, j)
       piece.to_s.colorize(color_options)
-      #piece.to_s
     end
   end
 
