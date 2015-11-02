@@ -73,21 +73,16 @@ class Board
   end
 
   def checkmate?(color)
-    #no more valid moves for king
-    #find all the valid moves of the king and determine if all of them are in the pos positions of the opponent
     return false unless in_check(color)
     king = find_king(color)
     pieces.select {|piece| piece.color == color }.all? { |piece| piece.valid_moves.empty? }
 
   end
 
-  def board_dup
-    # board_dup = self.dup
-    # iterate thru board_dup, for each spot,  do piece.dup and pass board_dup
+  def dup
     new_board = Board.new(false)
     self.grid.each_with_index do |row, row_idx|
       row.each_with_index do |piece, col_idx|
-        #debugger
         new_board.grid[row_idx][col_idx] = piece.piece_dup(new_board)
       end
     end

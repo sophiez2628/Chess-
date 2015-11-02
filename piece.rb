@@ -17,20 +17,18 @@ class Piece
     " x "
   end
 
-  def valid_moves(start, end_pos, pos_moves = nil)
-     #moves that do not leave the king in check 
-     if !pos_moves.include?(end_pos)
-       return false
-     elsif @board.blocked_route?(start, end_pos, pos_moves)
-       return false
-     else
-       board_copied = board.board_dup
-       board_copied[end_pos] = board[start]
-       board_copied[start] = NullPiece.new(nil, nil, self)
-       !board_copied.in_check?(self.color)
-     end
-     true
-   end
+  def move_into_check?(to_pos)
+    board_copied = board.dup
+    #what class is responsible for what action?
+    board_copied.move_piece(pos, to_pos) 
+    board_copied.in_check?(color)
+  end
+
+  def valid_moves
+    self.moves.select do |move|
+      !self.move_into_check?(move)
+    end
+  end
 
 
   def piece_dup(new_board)
@@ -174,6 +172,7 @@ end
 
 class NullPiece
   include Singleton
+
 
   def present?
     false
