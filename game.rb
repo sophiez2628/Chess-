@@ -5,7 +5,7 @@ class Game
   attr_accessor :board, :player_1, :player_2, :current_player
 
   def initialize
-    @board = Board.new
+    @board = Board.new(self)
     @player_1 = Player.new(@board, :white)
     @player_2 = Player.new(@board, :black)
   end
@@ -16,9 +16,9 @@ class Game
       selected_pos = current_player.move_cursor # gets input from move_cursor method
       set_pos = current_player.move_cursor # gets input form move_cursor method
       board.move_piece(@current_player.color, selected_pos, set_pos) # tells board to validate and move piece
-      swap_player!
     end
   end
+
 
   def game_over?
     if board.checkmate?(current_player.color)

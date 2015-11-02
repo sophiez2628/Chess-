@@ -5,8 +5,10 @@ require 'Set'
 
 class Board
   attr_accessor :grid
+  attr_reader :game
 
-  def initialize(setup_board = true)
+  def initialize(game = nil, setup_board = true)
+    @game = game
     @null_piece = NullPiece.instance
     @grid = Array.new(8) { Array.new(8, null_piece )}
     populate if setup_board
@@ -80,7 +82,7 @@ class Board
   end
 
   def dup
-    new_board = Board.new(false)
+    new_board = Board.new(nil, false)
     self.grid.each_with_index do |row, row_idx|
       row.each_with_index do |piece, col_idx|
         new_board[[row_idx, col_idx]] = piece.piece_dup(new_board)
@@ -93,11 +95,20 @@ class Board
     piece = self[start]
 
     if piece.color != turn_color
-      raise 'You must move your own piece'
+      begin
+        raise "You must move your own piece"
+      rescue
+        puts "Try again"
+      end
     elsif piece.valid_move?(end_pos)
       self.move_piece!(start, end_pos)
+      game.swap_player!
     else
-      raise 'Move is invalid'
+      begin
+        raise "Move is invalid"
+      rescue
+        puts "Try again"
+      end
     end
 
   end

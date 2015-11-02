@@ -42,5 +42,6 @@ class Display
   def render
     system("clear")
     build_grid.each_with_index { |row, index| puts row.join }
+    puts "current player is #{board.game.current_player.color}"
   end
 end
