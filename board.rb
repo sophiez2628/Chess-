@@ -53,8 +53,6 @@ class Board
   end
 
   def []=(pos, value)
-    puts pos.inspect
-    puts value
     x, y = pos
     @grid[x][y] = value
   end

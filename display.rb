@@ -27,8 +27,8 @@ class Display
   def colors_for(i, j)
     if [i, j] == cursor_pos
       bg = :light_red
-    # elsif board[cursor_pos].valid_moves.include?([i, j])
-    #   bg = :yellow
+    elsif board[cursor_pos].valid_moves.include?([i, j])
+      bg = :yellow
     elsif (i + j).odd?
       bg = :light_blue
     else

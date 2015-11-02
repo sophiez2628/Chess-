@@ -203,6 +203,11 @@ class NullPiece
     []
   end
 
+  def valid_moves
+    []
+  end
+
+
   def moves(start_pos)
     []
   end
