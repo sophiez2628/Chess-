@@ -12,15 +12,15 @@ module SlidingPiece
     NORMAL_MOVES_DIRC
   end
 
-  def moves(start_pos, moves_dirc)
+  def moves
     moves = []
 
     moves_dirc.each do |dirc|
-      until !board.in_bounds?(start_pos) || board.occupied?(start_pos, self.color)
-        row_idx = dirc.first + start_pos.first
-        col_idx = dirc.last + start_pos.last
-        moves += [row_idx, col_idx]
-        start_pos = [row_idx, col_idx]
+      until !board.in_bounds?(pos) || board.occupied?(pos, self.color)
+        row_idx = dirc.first + pos.first
+        col_idx = dirc.last + pos.last
+        moves << [row_idx, col_idx]
+        pos = [row_idx, col_idx]
       end
     end
       moves
@@ -31,30 +31,16 @@ end
 
 module SteppingPiece
   #knight, king
-  KNIGHT_MOVES_DIFF = [[-2,1], [2, -1], [2,1], [-2,-1],[-1,2],[1,-2],[-1,-2],[1,2]]
-  KING_MOVES_DIFF = [[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1],[-1,0],[-1,1]]
-  def knight_moves(start_pos)
+  def moves
     moves = []
-    KNIGHT_MOVES_DIFF.each do |diff|
-      x = diff.first - start_pos.first
-      y = diff.last - start_pos.last
-      #debugger
-      next if board.occupied?([x,y], self.color)
-      moves << [x, y] if board.in_bounds?([x,y])
+    moves_dirc.each do |dirc|
+      row_idx = pos[0] + dirc[0]
+      col_idx = pos[1] + dirc[1]
+      if board.in_bounds?([row_idx, col_idx]) && !board.occupied?([row_idx, col_idx], self.color)
+        moves << [row_idx, col_idx]
+      end
     end
     moves
   end
-
-  def king_moves(start_pos)
-    moves = []
-    KING_MOVES_DIFF.each do |diff|
-      x = diff.first - start_pos.first
-      y = diff.last - start_pos.last
-      next if board.occupied?([x,y], self.color)
-      moves << [x, y] if board.in_bounds?([x,y])
-    end
-    moves
-  end
-
 
 end

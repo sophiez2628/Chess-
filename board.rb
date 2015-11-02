@@ -8,11 +8,11 @@ class Board
 
   def initialize(setup_board = true)
     @null_piece = NullPiece.instance
+    @grid = Array.new(8) { Array.new(8, null_piece )}
     populate if setup_board
   end
 
   def populate
-    @grid = Array.new(8) { Array.new(8, null_piece )}
     # break down tasks
     [:black, :white].each do |color|
       fill_back_row(color)
@@ -53,6 +53,8 @@ class Board
   end
 
   def []=(pos, value)
+    puts pos.inspect
+    puts value
     x, y = pos
     @grid[x][y] = value
   end
@@ -60,7 +62,7 @@ class Board
   def in_check?(color)
     king_pos = find_king(color).pos
     pieces.any? do |piece|
-      piece.color != color && piece.moves(piece.pos, piece.moves_dirc).include?(king_pos)
+      piece.color != color && piece.moves.include?(king_pos)
     end
   end
 
@@ -73,7 +75,7 @@ class Board
   end
 
   def checkmate?(color)
-    return false unless in_check(color)
+    return false unless self.in_check?(color)
     king = find_king(color)
     pieces.select {|piece| piece.color == color }.all? { |piece| piece.valid_moves.empty? }
 
@@ -83,7 +85,7 @@ class Board
     new_board = Board.new(false)
     self.grid.each_with_index do |row, row_idx|
       row.each_with_index do |piece, col_idx|
-        new_board.grid[row_idx][col_idx] = piece.piece_dup(new_board)
+        new_board[[row_idx, col_idx]] = piece.piece_dup(new_board)
       end
     end
     new_board
@@ -103,6 +105,8 @@ class Board
   end
 
   def move_piece!(start, end_pos)
+    # puts start.inspect
+    # puts end_pos
     piece = self[start]
     self[start] = null_piece
     self[end_pos] = piece
@@ -123,11 +127,9 @@ class Board
   end
 
   def occupied?(pos, own_color)
-    # if occupied true, return piece. if false, return false
-    #debugger
-    if self.grid[pos.first][pos.last].is_a?(NullPiece)
+    if self[pos].is_a?(NullPiece)
       false
-    elsif self.grid[pos.first][pos.last].color != own_color
+    elsif self[pos].color != own_color
       false
     else
       true

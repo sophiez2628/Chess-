@@ -2,13 +2,13 @@ require_relative "display"
 
 class Player
   attr_reader :color
-  
+
   def initialize(board, color)
     @display = Display.new(board)
     @color = color
   end
 
-  def move_curser
+  def move_cursor
     result = nil
     until result
       @display.render
@@ -16,7 +16,5 @@ class Player
     end
     result
   end
-
-
 
 end

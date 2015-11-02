@@ -1,8 +1,25 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    binding_of_caller (0.7.2)
+      debug_inspector (>= 0.0.1)
     byebug (6.0.2)
+    coderay (1.1.0)
     colorize (0.7.7)
+    debug_inspector (0.0.2)
+    interception (0.5)
+    method_source (0.8.2)
+    pry (0.10.3)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
+    pry-rescue (1.4.2)
+      interception (>= 0.5)
+      pry
+    pry-stack_explorer (0.4.9.2)
+      binding_of_caller (>= 0.7)
+      pry (>= 0.9.11)
+    slop (3.6.0)
 
 PLATFORMS
   ruby
@@ -10,6 +27,8 @@ PLATFORMS
 DEPENDENCIES
   byebug
   colorize
+  pry-rescue
+  pry-stack_explorer
 
 BUNDLED WITH
    1.10.6

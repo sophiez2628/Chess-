@@ -41,14 +41,14 @@ module Cursorable
     when :ctrl_c
       exit 0
     when :return, :space
+      puts "cursor_pos  #{@cursor_pos.inspect}"
       @cursor_pos
-      puts @cursor_pos.inspect
       # returns [row, col], starting with row 0 and col 0
     when :left, :right, :up, :down
       update_pos(MOVES[key])
       nil
     else
-      puts key
+      # puts key
     end
   end
 

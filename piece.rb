@@ -2,7 +2,8 @@ require_relative 'module'
 require 'byebug'
 require 'singleton'
 class Piece
-  attr_reader :color, :pos, :board
+  attr_reader :color, :board
+  attr_accessor :pos
   def initialize(color, pos, board)
     @color = color
     @pos = pos
@@ -44,13 +45,6 @@ end
 
 class Pawn < Piece
 
-  def initialize(color, pos, board)
-    super
-    @moved = false
-  end
-
-  attr_accessor :moved
-
   def to_s
     color == :white ? " \u2659 " : " \u265f "
   end
@@ -59,39 +53,47 @@ class Pawn < Piece
     false
   end
 
-  MOVE_UP = [[2,0],[1,0]]
-  DIAG = [[1, -1], [1, 1]]
-  def moves(start_pos)
+  MOVE_FORWARD = [[2,0],[1,0]]
+  MOVE_DIAG = [[1, -1], [1, 1]]
+
+  def moves
+    forward_steps + diag_steps
+  end
+
+  def at_starting_row?
+    pos.first == ((color == :white) ? 6 : 1)
+  end
+
+  def forward_dirc
+    color == :white ? -1 : 1
+  end
+
+  def forward_steps
     moves = []
-    debugger
-    MOVE_UP.each do |pos|
-      #change pawn's moved instance variable after being moved
-      next if self.moved
-      if self.color == :white
-        row_idx = pos.first + start_pos.first
-        col_idx = pos.last + start_pos.first
-        #debugger
+    row_idx, col_idx = pos
 
-        moves += [row_idx, col_idx] if board.in_bounds?([row_idx, col_idx]) && board.grid[row_idx][col_idx].is_a?(NullPiece)
-      else
-        row_idx = pos.first - start_pos.first
-        col_idx = pos.last - start_pos.first
-        moves += [row_idx, col_idx] if board.in_bounds?([row_idx, col_idx]) && board.grid[row_idx][col_idx].is_a?(NullPiece)
-      end
+    two_step = [row_idx + forward_dirc * 2, col_idx]
+    if at_starting_row? && !board.occupied?(two_step, color)
+      moves << [row_idx + forward_dirc * 2, col_idx]
     end
 
-    DIAG.each do |pos|
-      if self.color == :white
-        row_idx = pos.first + start_pos.first
-        col_idx = pos.last + start_pos.first
-        moves += [row_idx, col_idx] if board.in_bounds?([row_idx, col_idx]) && board.grid[row_idx][col_idx].color != self.color
-      else
-        row_idx = pos.first - start_pos.first
-        col_idx = pos.last - start_pos.first
-        moves += [row_idx, col_idx] if board.in_bounds?([row_idx, col_idx]) && board.grid[row_idx][col_idx].color != self.color
-      end
+    one_step = [row_idx + forward_dirc, col_idx]
+    if board.in_bounds?(one_step) && !board.occupied?(one_step, color)
+      moves << one_step
     end
+
     moves
+  end
+
+  def diag_steps
+    row_idx, col_idx = pos
+    side_moves = [[row_idx + forward_dirc, col_idx - 1], [row_idx + forward_dirc, col_idx + 1]]
+
+    side_moves.select do |move|
+      next false if board[move].is_a?(NullPiece)
+      board.in_bounds?(move) && board[move].color != color
+    end
+
   end
 
 
@@ -124,6 +126,10 @@ class Rook < Piece
     NORMAL_MOVES_DIRC
   end
 
+  def empty?
+    false
+  end
+
 
 end
 
@@ -145,6 +151,9 @@ end
 
 class Knight < Piece
   include SteppingPiece
+
+  KNIGHT_MOVES_DIFF = [[-2,1], [2, -1], [2,1], [-2,-1],[-1,2],[1,-2],[-1,-2],[1,2]]
+
   def to_s
     color == :white ? " \u2658 " : " \u265e "
   end
@@ -153,25 +162,29 @@ class Knight < Piece
     false
   end
 
-  def moves(start_pos)
-    knight_moves(start_pos)
+  def moves_dirc
+    KNIGHT_MOVES_DIFF
   end
 end
 
 
 class King < Piece
   include SteppingPiece
+
+  KING_MOVES_DIFF = [[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1],[-1,0],[-1,1]]
+
   def to_s
     color == :white ? " \u2654 " : " \u265a "
-  end
-
-  def moves(start_pos)
-    king_moves(start_pos)
   end
 
   def empty?
     false
   end
+
+  def moves_dirc
+    KING_MOVES_DIFF
+  end
+
 end
 
 class NullPiece
@@ -196,5 +209,9 @@ class NullPiece
 
   def empty?
     true
+  end
+
+  def piece_dup(new_board)
+    NullPiece.instance
   end
 end
