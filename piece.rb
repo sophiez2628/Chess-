@@ -20,7 +20,7 @@ class Piece
   def move_into_check?(to_pos)
     board_copied = board.dup
     #what class is responsible for what action?
-    board_copied.move_piece(pos, to_pos) 
+    board_copied.move_piece!(pos, to_pos)
     board_copied.in_check?(color)
   end
 
@@ -28,6 +28,10 @@ class Piece
     self.moves.select do |move|
       !self.move_into_check?(move)
     end
+  end
+
+  def valid_move?(end_pos)
+    self.valid_moves.include?(end_pos)
   end
 
 

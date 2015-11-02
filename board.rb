@@ -89,21 +89,25 @@ class Board
     new_board
   end
 
-  def move_piece(start, end_pos)
-#debugger
-    if self.in_check?(self.grid[start.first][start.last].color)
-      # only validate moves that take current player of check
-      # if player cant get out of check, thats a checkmate
+  def move_piece(turn_color, start, end_pos)
+    piece = self[start]
 
-    elsif self[start].valid_move?(start, end_pos)
-      #move piece
-      self[end_pos] = self[start]
-      self[start] = NullPiece.new(nil, nil, self)
+    if piece.color != turn_color
+      raise 'You must move your own piece'
+    elsif piece.valid_move?(end_pos)
+      self.move_piece!(start, end_pos)
     else
-      #raise error
+      raise 'Move is invalid'
     end
+
   end
 
+  def move_piece!(start, end_pos)
+    piece = self[start]
+    self[start] = null_piece
+    self[end_pos] = piece
+    piece.pos = end_pos
+  end
 
   def blocked_route?(start, end_pos, pos_moves)
     #after making sure that end_pos is one of the possible moves, check that the route is clear
