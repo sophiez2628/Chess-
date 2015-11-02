@@ -16,16 +16,24 @@ module SlidingPiece
     moves = []
 
     moves_dirc.each do |dirc|
-      until !board.in_bounds?(pos) || board.occupied?(pos, self.color)
-        row_idx = dirc.first + pos.first
-        col_idx = dirc.last + pos.last
-        moves << [row_idx, col_idx]
-        pos = [row_idx, col_idx]
+      new_pos = self.pos
+      new_pos = add_pos_dirc(new_pos, dirc)
+      until !board.in_bounds?(new_pos)
+        if !board.occupied?(new_pos, self.color)
+          moves << new_pos
+          new_pos = add_pos_dirc(new_pos, dirc)
+        else
+          new_pos = [100, 100]
+        end
       end
     end
+
       moves
   end
 
+  def add_pos_dirc(pos, dirc)
+    [pos.first + dirc.first, pos.last + dirc.last]
+  end
 
 end
 
