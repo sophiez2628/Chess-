@@ -73,7 +73,6 @@ module SlidingPiece
 
   def moves
     moves = []
-
     moves_dirc.each do |dirc|
       new_pos = self.pos
       new_pos = add_pos_dirc(new_pos, dirc)
@@ -86,7 +85,6 @@ module SlidingPiece
         end
       end
     end
-
       moves
   end
 
