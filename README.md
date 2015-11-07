@@ -10,7 +10,7 @@ download the file, then open up your terminal and run this line:
 Use the arrow keys to move the cursor. Press enter to select a piece to move. Move the cursor to the position you want to move the piece to and press enter again. The yellow highlighting on the board indicates the locations available for the piece.
 
 ###Code Highlights
-I wrote an algorithm that checks for the validity of a player's move. The move is valid only if it does not place the king in check.
+* I wrote an algorithm that checks for the validity of a player's move. The move is valid only if it does not place the king in check.
 
 <pre><code>
 def move_into_check?(to_pos)
@@ -26,7 +26,7 @@ def valid_moves
 end
 </pre></code>
 
-The different pieces in the game inherit from the Piece class so that the code remains DRY.
+* The different pieces in the game inherit from the Piece class so that the code remains DRY.
 
 <pre><code>
 class Piece
@@ -54,7 +54,7 @@ class Pawn < Piece
 end
 </pre></code>
 
-The logic of similar piece classes are placed in modules. For example, the queen, bishops, and rooks can slide, so I built a module called Slidable.
+* The logic of similar piece classes are placed in modules. For example, the queen, bishops, and rooks can slide, so I built a module called Slidable.
 
 <pre><code>
 module SlidingPiece
